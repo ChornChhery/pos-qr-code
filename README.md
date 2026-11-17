@@ -1,11 +1,8 @@
-Restaurant POS System - README.md
-Here is a complete, professional README file for your project:
-markdown
 <div align="center">
 
-# 🍽️ Restaurant POS & Ordering System
+# Restaurant POS & Ordering System
 
-### A Modern Microservices-Based Point of Sale Solution for Small to Medium Restaurants
+**A microservices-based point of sale and QR ordering system for small and medium restaurants.**
 
 [![.NET 10](https://img.shields.io/badge/.NET-10-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-14+-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
@@ -14,328 +11,332 @@ markdown
 [![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
 
-[Features](#-features) • [Architecture](#-architecture) • [Documentation](#-documentation) • [Quick Start](#-quick-start) • [Tech Stack](#-tech-stack)
+[![Status](https://img.shields.io/badge/status-documentation--only-yellow?style=for-the-badge)](#project-status)
+[![License](https://img.shields.io/badge/license-proprietary-lightgrey?style=for-the-badge)](#license)
+
+[Features](#features) | [Architecture](#architecture) | [Tech Stack](#tech-stack) | [Getting Started](#getting-started) | [Documentation](#documentation) | [Roadmap](#roadmap)
 
 </div>
 
 ---
 
-## 📋 Overview
+## Overview
 
-A **single-URL restaurant POS and ordering system** designed specifically for small to medium restaurants. The system serves two distinct user flows on the same domain:
+A single-URL restaurant POS and ordering system that serves two flows from the same domain:
 
-1. **📱 Customer Flow:** Scan QR code → View menu → Customize orders → Place order (No login required)
-2. **💼 Staff Flow:** Login → Unified dashboard for order management, kitchen display, and reporting
+1. **Customer (public, no login):** scan a table QR code, browse the menu, customize items, and place an order.
+2. **Staff (private, login):** one dashboard for live orders, kitchen display, cashier payments, and admin.
 
-Built with **enterprise-grade microservices architecture** while maintaining simplicity for restaurant operations.
+The system is designed for small teams that cannot staff separate owner and kitchen roles. It
+uses an event-driven microservices architecture so each service can evolve independently.
 
-### 🎯 Key Business Benefits
-- ✅ **Zero Customer Friction:** No app download, no account creation, just scan and order
-- ✅ **Unified Owner/Kitchen View:** One dashboard for small teams (no context switching)
-- ✅ **Real-Time Order Processing:** Kitchen sees orders instantly via WebSocket
-- ✅ **Mobile-First Design:** Optimized for mid-range smartphones on restaurant Wi-Fi
-- ✅ **Independent Service Updates:** Microservices allow updating one feature without touching others
-- ✅ **Scalable Architecture:** Ready to grow from single location to multi-location
+### Why this design
 
----
-
-## ✨ Features
-
-### For Customers (Public Interface)
-- 📲 **QR Code Table Ordering:** Scan table QR → Instant menu access
-- 🎨 **Beautiful Mobile Menu:** Fast-loading, image-rich, touch-optimized
-- 🔧 **Product Customization:** Modifiers for spice levels, add-ons, special instructions
-- 🛒 **Smart Cart:** Real-time price calculation with modifiers and taxes
-- 📊 **Order Tracking:** Live status updates (Pending → Cooking → Ready)
-
-### For Kitchen & Owner (Unified Dashboard)
-- 👨‍🍳 **Live Order Queue (KDS):** Real-time order display with status management
-- ⚡ **Quick Actions:** One-tap status updates (Start Cooking, Mark Ready)
-- 📉 **Stock Management:** Toggle items "Sold Out" instantly (hides from customer menu)
-- 🪑 **Table Management:** Track table status (Available, Occupied, Cleaning)
-- 📈 **Basic Reports:** Daily sales, top-selling items, revenue breakdown
-
-### For Cashiers
-- 💰 **Payment Processing:** Cash and QR code payments
-- 📸 **Slip Verification:** Upload and verify QR payment slips
-- 🧾 **Receipt Printing:** Professional receipt generation
-- 📋 **Order Management:** View and manage all active orders
-
-### For Administrators
-- 👥 **Staff Management:** Create users, assign roles (Owner, Admin, Cashier, Kitchen)
-- 🍔 **Full Menu Control:** CRUD operations for categories, products, modifiers
-- 📊 **Advanced Analytics:** Comprehensive sales reports, inventory tracking
-- 🔒 **Audit Logging:** Track all sensitive actions (who did what, when)
-- ⚙️ **System Configuration:** Tax rates, business hours, settings
+- **Zero customer friction:** no app download, no account, no password.
+- **One dashboard for small teams:** owner and kitchen share a live order queue.
+- **Real-time by default:** new orders reach the kitchen in under a second through SignalR.
+- **Mobile-first:** optimized for mid-range Android phones on restaurant Wi-Fi.
+- **Independent services:** menu, orders, payments, and notifications deploy separately.
+- **Scalable:** runs on one location today and can grow to many.
 
 ---
 
-## 🏗️ Architecture
+## Features
 
-### High-Level System Design
-┌─────────────────────────────────────────────────────────────┐
-│ CLIENTS │
-│ ┌──────────────┐ ┌──────────────────────┐ │
-│ │ Mobile Phone │ │ Staff Dashboard │ │
-│ │ (Customer) │ │ (Owner/Kitchen) │ │
-│ └──────┬───────┘ └──────────┬───────────┘ │
-└─────────┼─────────────────────────────────┼────────────────┘
-│ │
-└────────────┬────────────────────┘
-│
-┌────────▼────────┐
-│ API Gateway │
-│ (YARP) │
-│ Port: 5000 │
-└────────┬────────┘
-│
-┌──────────────┼──────────────┬──────────────┐
-│ │ │ │
-┌───────▼──────┐ ┌─────▼──────┐ ┌────▼───────┐ ┌───▼──────────┐
-│ Identity │ │ Catalog │ │ Order │ │ Notification │
-│ Service │ │ Service │ │ Service │ │ Service │
-│ Port: 5003 │ │ Port: 5001 │ │ Port: 5002 │ │ Port: 5005 │
-└───────┬──────┘ └─────┬──────┘ └────┬───────┘ └───┬──────────┘
-│ │ │ │
-│ │ │ │
-┌───────▼──────┐ ┌─────▼──────┐ ┌────▼───────┐ │
-│ identity_db │ │ catalog_db │ │ order_db │ │
-│ (PostgreSQL) │ │(PostgreSQL)│ │(PostgreSQL)│ │
-└──────────────┘ └────────────┘ └────────────┘ │
-│
-┌────────────────────────────┘
-│
-┌────────▼────────┐
-│ RabbitMQ │
-│ (Event Bus) │
-└─────────────────┘
+| Area | Capabilities |
+| --- | --- |
+| **Customer menu** | QR table entry, category browsing, product modifiers, live cart totals, order submission, order status tracking |
+| **Kitchen display (KDS)** | Live order queue, one-tap status changes, elapsed-time warnings, sold-out toggles, large touch targets |
+| **Cashier** | Pending payments, cash with change calculation, QR slip upload and verification, receipt printing |
+| **Admin** | Staff and roles, table and QR management, full menu CRUD, order oversight, sales reports, audit logs, settings |
 
-### Microservices Breakdown
+### Order lifecycle
 
-| Service | Purpose | Database | Port |
-|---------|---------|----------|------|
-| **API Gateway** | Single entry point, routing, rate limiting | N/A | 5000 |
-| **Identity Service** | Authentication, JWT, RBAC, audit logs | `identity_db` | 5003 |
-| **Catalog Service** | Menu, products, modifiers, stock | `catalog_db` | 5001 |
-| **Order Service** | Tables, carts, orders, status tracking | `order_db` | 5002 |
-| **Payment Service** | Cash/QR payments, slip verification | `payment_db` | 5004 |
-| **Notification Service** | Real-time updates via SignalR | N/A | 5005 |
+```text
+PENDING -> COOKING -> READY -> COMPLETED
 
-### Event-Driven Communication
-Services communicate asynchronously via **RabbitMQ** for loose coupling:
-- `OrderCreated` → Triggers stock deduction + kitchen notification
-- `OrderStatusChanged` → Updates customer tracking
-- `LowStockAlert` → Notifies managers
-- `ProductUpdated` → Syncs across services
+CANCELLED can occur from PENDING, COOKING, or READY.
+```
+
+### Payment lifecycle
+
+```text
+PENDING -> PENDING_VERIFICATION -> COMPLETED
+
+PENDING or PENDING_VERIFICATION -> FAILED
+COMPLETED -> REFUNDED
+```
 
 ---
 
-## 📚 Documentation
+## Architecture
 
-Comprehensive documentation is provided in separate markdown files:
+The API Gateway is the only client entry point. Services own their data and communicate through
+RabbitMQ events. Real-time updates are pushed from the Notification Service over SignalR.
 
-| Document | Description |
-|----------|-------------|
-| [**PROJECT.md**](./PROJECT.md) | Business requirements, user flows, development phases |
-| [**ARCHITECTURE.md**](./ARCHITECTURE.md) | Detailed technical architecture, microservices design |
-| [**DEVELOPMENT.md**](./DEVELOPMENT.md) | Coding standards, git workflow, testing guidelines |
-| [**API.md**](./API.md) | Complete API documentation with request/response examples |
-| [**DATABASE.md**](./DATABASE.md) | Database schemas, relationships, migrations |
-| [**CLAUDE.md**](./CLAUDE.md) | AI assistant instructions and patterns |
-| [**SKILL.md**](./SKILL.md) | Required technical skills and competencies |
-| [**UX_UI.md**](./UX_UI.md) | Design system, user flows, accessibility standards |
-| [**SECURITY.md**](./SECURITY.md) | Threat model, security mitigations, compliance |
-| [**TESTING_STRATEGY.md**](./TESTING_STRATEGY.md) | Testing pyramid, tools, quality gates |
-| [**INFRASTRUCTURE.md**](./INFRASTRUCTURE.md) | DevOps strategy, cloud resources, CI/CD pipeline |
-| [**ONBOARDING.md**](./ONBOARDING.md) | Quick start guide for new developers |
+```mermaid
+flowchart TB
+    C["Customer phone"] --> GW
+    S["Staff dashboard"] --> GW
+
+    GW["API Gateway (YARP) :5000"]
+
+    GW --> ID["Identity :5003"]
+    GW --> CAT["Catalog :5001"]
+    GW --> ORD["Order :5002"]
+    GW --> PAY["Payment :5004"]
+    GW -. "SignalR /hubs/*" .-> NOTIF["Notification :5005"]
+
+    ID --> IDDB[("identity_db")]
+    CAT --> CATDB[("catalog_db")]
+    ORD --> ORDDB[("order_db")]
+    PAY --> PAYDB[("payment_db")]
+
+    ORD <--> MQ{{"RabbitMQ"}}
+    CAT <--> MQ
+    PAY <--> MQ
+    NOTIF <--> MQ
+    NOTIF -. "live updates" .-> S
+```
+
+### Services
+
+| Service | Port | Database | Responsibility |
+| --- | --- | --- | --- |
+| **API Gateway** (YARP) | 5000 | none | Routing, rate limiting, CORS, JWT pre-validation, logging |
+| **Identity** | 5003 | `identity_db` | Login, JWT, roles, audit logs |
+| **Catalog** | 5001 | `catalog_db` | Categories, products, modifiers, stock, sold-out status |
+| **Order** | 5002 | `order_db` | Tables, carts, orders, status transitions |
+| **Payment** | 5004 | `payment_db` | Cash, QR, slip upload, verification, refunds |
+| **Notification** | 5005 | none | SignalR hubs and live updates |
+
+### Order flow
+
+```mermaid
+sequenceDiagram
+    participant C as Customer
+    participant GW as API Gateway
+    participant O as Order Service
+    participant MQ as RabbitMQ
+    participant CAT as Catalog Service
+    participant N as Notification Service
+    participant K as Kitchen Dashboard
+
+    C->>GW: POST /api/orders/checkout
+    GW->>O: Create order
+    O->>O: Validate cart, prices, and stock
+    O->>MQ: Publish OrderCreated
+    MQ->>CAT: OrderCreated
+    CAT->>CAT: Deduct stock and publish LowStockAlert if needed
+    MQ->>N: OrderCreated
+    N-->>K: SignalR OrderCreated
+    O-->>C: 201 Created
+```
+
+### Events
+
+| Event | Published by | Consumed by | Effect |
+| --- | --- | --- | --- |
+| `OrderCreated` | Order | Catalog, Notification | Deduct stock, push order to kitchen |
+| `OrderStatusChanged` | Order | Notification | Update customer tracking |
+| `LowStockAlert` | Catalog | Notification | Alert manager |
+| `ProductCreated` / `ProductUpdated` | Catalog | Catalog consumers | Sync menu data |
+| `PaymentCompleted` | Payment | Order, Notification | Complete order, notify staff |
 
 ---
 
-## 🚀 Quick Start
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| **Frontend** | Next.js 14+ (App Router), React 18+, TypeScript strict mode, Tailwind CSS, shadcn/ui, Zustand, React Query, SignalR client |
+| **Backend** | .NET 10, C# 12+, Minimal APIs, Entity Framework Core, FluentValidation, MassTransit |
+| **Messaging** | RabbitMQ 3.13 with MassTransit |
+| **Gateway** | YARP reverse proxy |
+| **Real-time** | SignalR (WebSocket) |
+| **Database** | PostgreSQL 16, one database per service |
+| **Infrastructure** | Docker, Docker Compose, Terraform, GitHub Actions |
+| **Observability** | OpenTelemetry, Prometheus, Grafana |
+
+---
+
+## Repository Structure
+
+```text
+restaurant-pos/
+|-- apps/
+|   `-- frontend/                 # Next.js customer menu and staff dashboard
+|-- services/
+|   |-- ApiGateway/               # YARP gateway, port 5000
+|   |-- IdentityService/          # port 5003
+|   |-- CatalogService/           # port 5001
+|   |-- OrderService/             # port 5002
+|   |-- PaymentService/           # port 5004
+|   `-- NotificationService/      # port 5005
+|-- infra/
+|   |-- docker-compose.yml
+|   |-- terraform/
+|   `-- .github/workflows/
+|-- docs/
+|   `-- AI_CONTEXT_FULL.md        # Full specification
+|-- AI_CONTEXT.md                 # Compact specification
+|-- CLAUDE.md                     # AI and contributor rules
+|-- SKILL.md                      # Skill routing
+|-- AGENTS.md                     # Agent entry point
+`-- README.md
+```
+
+---
+
+## Project Status
+
+> **Documentation only.** There is no application code yet. The `apps/`, `services/`, and
+> `infra/` folders do not exist. Section commands below describe the intended setup and will
+> work once Phase 1 is scaffolded.
+
+| Milestone | Status |
+| --- | --- |
+| Product specification and AI context | Complete |
+| Architecture, API, and schema design | Complete |
+| Phase 1: Foundation and infrastructure | Not started |
+| Phase 2: Core business services | Not started |
+| Phase 3: Public customer menu | Not started |
+| Phase 4: Staff dashboard | Not started |
+| Phase 5: Payments and admin | Not started |
+| Phase 6: Testing and production | Not started |
+
+---
+
+## Getting Started
 
 ### Prerequisites
-- **Docker Desktop** (for containerized development)
-- **Node.js 20+** (for frontend)
-- **.NET 10 SDK** (for backend services)
-- **Git** (for version control)
 
-### Installation Steps
+| Tool | Version |
+| --- | --- |
+| Docker Desktop | Latest |
+| Node.js | 20+ |
+| .NET SDK | 10 |
+| Git | Latest |
+
+### Planned local setup
 
 ```bash
 # 1. Clone the repository
 git clone <repository-url>
 cd restaurant-pos
 
-# 2. Copy environment variables
+# 2. Create your environment file
 cp .env.example .env
 
-# 3. Start infrastructure (PostgreSQL, RabbitMQ)
-docker-compose up -d
+# 3. Start PostgreSQL and RabbitMQ
+docker compose up -d
 
-# 4. Start backend services (in separate terminals)
-cd services/ApiGateway && dotnet run
-cd services/IdentityService && dotnet run
-cd services/CatalogService && dotnet run
-cd services/OrderService && dotnet run
-cd services/NotificationService && dotnet run
+# 4. Run backend services (separate terminals)
+dotnet run --project services/ApiGateway
+dotnet run --project services/IdentityService
+dotnet run --project services/CatalogService
+dotnet run --project services/OrderService
+dotnet run --project services/PaymentService
+dotnet run --project services/NotificationService
 
-# 5. Start frontend
-cd apps/frontend
-npm install
-npm run dev
-Access Points
-Frontend: http://localhost:3000
-API Gateway: http://localhost:5000
-RabbitMQ Management: http://localhost:15672 (guest/guest)
-PostgreSQL: localhost:5432 (pos_user/pos_password)
-🛠️ Tech Stack
-Frontend
-Framework: Next.js 14+ (App Router)
-Language: TypeScript (Strict Mode)
-UI Library: React 18+ with Tailwind CSS
-Components: Shadcn UI
-State Management: Zustand (client), React Query (server)
-Real-time: SignalR JavaScript client
-Backend
-Framework: .NET 10 with C# 12+
-API Style: Minimal APIs (lightweight, fast)
-Database ORM: Entity Framework Core
-Messaging: MassTransit + RabbitMQ
-Gateway: YARP (Yet Another Reverse Proxy)
-Real-time: SignalR (built-in WebSocket support)
-Database
-Primary: PostgreSQL 16
-Strategy: Database per microservice (no shared databases)
-Features: JSONB for flexible data, UUID primary keys
-Infrastructure
-Containerization: Docker + Docker Compose
-IaC: Terraform (for cloud provisioning)
-CI/CD: GitHub Actions
-Monitoring: OpenTelemetry + Prometheus + Grafana
-🔒 Security
-Authentication & Authorization
-JWT Tokens: Short-lived access tokens (15 min) + long-lived refresh tokens (7 days)
-Token Storage: Access token in memory, refresh token in HttpOnly Secure cookie
-RBAC: Role-based access control (GUEST, CASHIER, KITCHEN, MANAGER, ADMIN)
-Validation: JWT validated at API Gateway AND sensitive microservices
-Security Features
-✅ Password hashing (bcrypt/Argon2)
-✅ SQL injection prevention (parameterized queries)
-✅ XSS protection (React escaping + CSP headers)
-✅ CORS configuration
-✅ Rate limiting on API Gateway
-✅ Audit logging for sensitive actions
-✅ HTTPS enforcement in production
-See SECURITY.md for detailed threat model and mitigations.
-📊 Development Phases
-Phase 1: Foundation & Infrastructure (Week 1-2)
-Repository setup and Docker Compose
-API Gateway (YARP) configuration
-Identity Service (JWT auth, RBAC)
-CI/CD pipeline setup
-Phase 2: Core Business Services (Week 3-4)
-Catalog Service (products, modifiers, stock)
-Order Service (cart, order lifecycle)
-Event-driven communication (RabbitMQ)
-Real-time updates (SignalR)
-Phase 3: Frontend - Public Menu (Week 5)
-Next.js app structure
-Mobile-optimized menu (SSR)
-Cart functionality
-Order submission
-Phase 4: Frontend - Staff Dashboard (Week 6)
-Staff login system
-Unified Owner/Kitchen dashboard
-Real-time order queue
-Menu and table management
-Phase 5: Payment & Advanced Features (Week 7)
-Payment Service (cash, QR, slip upload)
-Admin dashboard (reports, staff management)
-Audit logging
-Receipt printing
-Phase 6: Testing, DevOps & Deployment (Week 8-9)
-Unit and integration tests
-Load testing and optimization
-Terraform infrastructure
-Production deployment
-Monitoring setup
-Total Timeline: 8-9 weeks (10-11 weeks with buffer)
-🧪 Testing
-Testing Strategy
-70% Unit Tests: Business logic (price calculation, validation)
-20% Integration Tests: Service + database + message broker
-10% E2E Tests: Critical user journeys (Playwright)
-Quality Gates
-✅ 80%+ code coverage required
-✅ All E2E tests must pass
-✅ No linting errors
-✅ Security audit passed
-See TESTING_STRATEGY.md for detailed testing guidelines.
-🌐 Deployment
-Environments
-Local Development: Docker Compose with hot-reload
-Staging: Production mirror for QA and UAT
-Production: High-availability, auto-scaling, monitored
-Cloud Resources (AWS Example)
-Compute: AWS ECS Fargate (serverless containers)
-Database: Amazon RDS PostgreSQL (Multi-AZ)
-Message Broker: Amazon MQ (Managed RabbitMQ)
-Storage: Amazon S3 (images, payment slips)
-CDN: Cloudflare (caching, DDoS protection)
-CI/CD Pipeline
-Push to main → Run tests → Build Docker images
-Tag release → Deploy to Staging → Run E2E tests
-If passed → Deploy to Production (Blue/Green)
-See INFRASTRUCTURE.md for detailed DevOps strategy.
-🤝 Contributing
-Development Workflow
-Create feature branch: feature/POS-123-add-modifier-support
-Make changes and commit (follow Conventional Commits)
-Push and create Pull Request
-Request review from team
-Address feedback and squash merge
-Commit Message Format
-<type>(<scope>): <subject>
+# 5. Run the frontend
+npm install --prefix apps/frontend
+npm run dev --prefix apps/frontend
+```
 
-feat(order): add support for order notes
-fix(catalog): correct stock deduction logic
-docs(api): update payment endpoint documentation
-Code Review Checklist
-Code follows style guidelines
-Tests added/updated
-Documentation updated
-No security vulnerabilities
-Performance considered
-See DEVELOPMENT.md for complete guidelines.
-📸 Screenshots
-Screenshots will be added once the UI is implemented
-Customer Menu (Mobile)
-<!-- Add screenshot here -->
+### Planned endpoints
 
-Kitchen Display System
-<!-- Add screenshot here -->
+| Service | URL |
+| --- | --- |
+| Frontend | <http://localhost:3000> |
+| API Gateway | <http://localhost:5000> |
+| RabbitMQ Management | <http://localhost:15672> |
+| PostgreSQL | `localhost:5432` |
 
-Admin Dashboard
-<!-- Add screenshot here -->
+---
 
-🐛 Troubleshooting
-Common Issues
-Services can't connect to PostgreSQL
-Check docker-compose.yml network configuration
-Ensure services are on the same network
-Verify connection strings in .env
-RabbitMQ messages not being consumed
-Check RabbitMQ Management UI (http://localhost:15672)
-Verify queues and bindings are correct
-Check service logs for connection errors
-Frontend can't connect to API
-Verify NEXT_PUBLIC_API_URL in .env.local
-Check CORS settings in API Gateway
-Ensure API Gateway is running on port 5000
-JWT token validation fails
-Verify JWT secret is same across all services
-Check token expiry (15 min for access, 7 days for refresh)
-Ensure issuer and audience match configuration
-See DEVELOPMENT.md for more troubleshooting tips.
-📝 License
-This project is proprietary software. All rights reserved.
+## Documentation
+
+| Document | Status | Purpose |
+| --- | --- | --- |
+| [README.md](./README.md) | Available | Project overview |
+| [AI_CONTEXT.md](./AI_CONTEXT.md) | Available | Compact specification: flows, services, schemas, API |
+| [docs/AI_CONTEXT_FULL.md](./docs/AI_CONTEXT_FULL.md) | Available | Full original specification |
+| [CLAUDE.md](./CLAUDE.md) | Available | Hard rules for AI agents and contributors |
+| [SKILL.md](./SKILL.md) | Available | Skill routing for AI-assisted work |
+| [AGENTS.md](./AGENTS.md) | Available | Agent entry point and read order |
+| `PROJECT.md` | Planned | Business requirements and phases |
+| `ARCHITECTURE.md` | Planned | Detailed technical design |
+| `DEVELOPMENT.md` | Planned | Coding standards and git workflow |
+| `API.md` | Planned | Endpoint reference with examples |
+| `DATABASE.md` | Planned | Schemas, relationships, migrations |
+| `UX_UI.md` | Planned | Design system and accessibility |
+| `SECURITY.md` | Planned | Threat model and mitigations |
+| `TESTING_STRATEGY.md` | Planned | Test pyramid and quality gates |
+| `INFRASTRUCTURE.md` | Planned | DevOps and deployment |
+| `ONBOARDING.md` | Planned | New developer quick start |
+
+---
+
+## Security
+
+- JWT access tokens (15 minutes) held in memory, refresh tokens (7 days) in HttpOnly Secure cookies.
+- Role-based access control validated at the gateway and at each service.
+- Parameterized queries only; Entity Framework Core by default, raw SQL forbidden without review.
+- Rate limiting on public order and payment-slip endpoints.
+- Payment slips treated as untrusted uploads and verified by a cashier or manager.
+- HTTPS, CSP, and strict CORS enforced in production.
+- Audit logging for all sensitive actions.
+- No secrets in source; environment variables only.
+
+---
+
+## Roadmap
+
+- [x] Business requirements and user flows
+- [x] Microservices architecture and data model
+- [x] API contracts and event definitions
+- [x] AI context and contributor rules
+- [ ] Phase 1: Repository, Docker Compose, YARP gateway, Identity Service, CI/CD
+- [ ] Phase 2: Catalog, Order, RabbitMQ events, SignalR, migrations
+- [ ] Phase 3: Public mobile menu with SSR and cart
+- [ ] Phase 4: Staff dashboard, KDS, menu and table management, receipt printing
+- [ ] Phase 5: Payment Service, admin reports, audit logs, QR generation
+- [ ] Phase 6: Tests, load testing, monitoring, security audit, production deploy
+
+---
+
+## Testing and Quality Gates
+
+| Layer | Share | Tools |
+| --- | --- | --- |
+| Unit | 70% | xUnit, Moq, FluentAssertions, Vitest |
+| Integration | 20% | Testcontainers, service-level tests |
+| End-to-end | 10% | Playwright |
+
+Merge is blocked when coverage drops below 80%, an E2E test fails, or lint reports errors.
+Critical paths under test: cart calculation, stock deduction, order transitions, RBAC, and
+payment verification.
+
+---
+
+## Contributing
+
+1. Create a branch: `feature/POS-123-add-modifier-support`.
+2. Commit with [Conventional Commits](https://www.conventionalcommits.org/): `feat(order): add order notes`.
+3. Open a pull request and request review.
+4. Address feedback and squash merge.
+
+Checklist:
+
+- [ ] Code follows the project style.
+- [ ] Tests added or updated.
+- [ ] Documentation updated.
+- [ ] No security regressions.
+- [ ] Performance considered.
+
+---
+
+## License
+
+Proprietary software. All rights reserved.
