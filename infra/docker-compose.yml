@@ -1,0 +1,75 @@
+# Run from the repository root:
+#   docker compose -f infra/docker-compose.yml --env-file .env up -d --wait postgres rabbitmq
+# Add the "apps" profile to also run the gateway and identity service in containers:
+#   docker compose -f infra/docker-compose.yml --env-file .env --profile apps up -d --build
+name: pos
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    ports:
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:?set RABBITMQ_USER in .env}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:?set RABBITMQ_PASSWORD in .env}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbit_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  identity:
+    profiles: ["apps"]
+    build:
+      context: ../services/IdentityService
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_URLS: http://+:5003
+      ConnectionStrings__IdentityDb: Host=postgres;Port=5432;Database=identity_db;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?set JWT_SIGNING_KEY in .env}
+      Seed__AdminUsername: ${SEED_ADMIN_USERNAME:-admin}
+      Seed__AdminPassword: ${SEED_ADMIN_PASSWORD:-}
+    ports:
+      - "5003:5003"
+
+  gateway:
+    profiles: ["apps"]
+    build:
+      context: ../services/ApiGateway
+    restart: unless-stopped
+    depends_on:
+      - identity
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ASPNETCORE_URLS: http://+:5000
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?set JWT_SIGNING_KEY in .env}
+    ports:
+      - "5000:5000"
+
+volumes:
+  pg_data:
+  rabbit_data:

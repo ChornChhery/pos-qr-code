@@ -175,8 +175,12 @@ restaurant-pos/
 |   `-- NotificationService/      # port 5005
 |-- infra/
 |   |-- docker-compose.yml
-|   |-- terraform/
-|   `-- .github/workflows/
+|   |-- postgres/init/        # creates the four service databases
+|   `-- terraform/
+|-- .github/workflows/        # CI (GitHub only reads workflows from the repo root)
+|-- scripts/                  # dev-setup, run-all, smoke-test, make-phase-zip
+|-- tests/
+|   `-- IdentityService.Tests/
 |-- docs/
 |   `-- AI_CONTEXT_FULL.md        # Full specification
 |-- AI_CONTEXT.md                 # Compact specification
@@ -190,15 +194,15 @@ restaurant-pos/
 
 ## Project Status
 
-> **Documentation only.** There is no application code yet. The `apps/`, `services/`, and
-> `infra/` folders do not exist. Section commands below describe the intended setup and will
-> work once Phase 1 is scaffolded.
+> **Phase 1 is built.** The API Gateway, Identity Service, Docker Compose, CI, and Terraform
+> foundation exist. Phases 2-6 (Catalog, Order, frontend, payments, hardening) are not built yet.
+> See [docs/PHASE_1_NOTES.md](./docs/PHASE_1_NOTES.md) and [docs/PHASE_1_RUNBOOK.md](./docs/PHASE_1_RUNBOOK.md).
 
 | Milestone | Status |
 | --- | --- |
 | Product specification and AI context | Complete |
 | Architecture, API, and schema design | Complete |
-| Phase 1: Foundation and infrastructure | Not started |
+| Phase 1: Foundation and infrastructure | Built (verify with the runbook) |
 | Phase 2: Core business services | Not started |
 | Phase 3: Public customer menu | Not started |
 | Phase 4: Staff dashboard | Not started |
@@ -218,36 +222,28 @@ restaurant-pos/
 | .NET SDK | 10 |
 | Git | Latest |
 
-### Planned local setup
+### Local setup (Windows PowerShell)
 
-```bash
-# 1. Clone the repository
-git clone <repository-url>
-cd restaurant-pos
-
-# 2. Create your environment file
-cp .env.example .env
-
-# 3. Start PostgreSQL and RabbitMQ
-docker compose up -d
-
-# 4. Run backend services (separate terminals)
-dotnet run --project services/ApiGateway
-dotnet run --project services/IdentityService
-dotnet run --project services/CatalogService
-dotnet run --project services/OrderService
-dotnet run --project services/PaymentService
-dotnet run --project services/NotificationService
-
-# 5. Run the frontend
-npm install --prefix apps/frontend
-npm run dev --prefix apps/frontend
+```powershell
+# from the repository root
+.\scripts\dev-setup.ps1      # creates .env, builds, creates the DB migration, starts PostgreSQL + RabbitMQ
+.\scripts\run-all.ps1        # starts the Gateway (5000) and Identity Service (5003)
+.\scripts\smoke-test.ps1     # checks login, refresh, RBAC, and user management through the gateway
 ```
 
-### Planned endpoints
+Full steps and troubleshooting: [docs/PHASE_1_RUNBOOK.md](./docs/PHASE_1_RUNBOOK.md).
 
-| Service | URL |
-| --- | --- |
+### Endpoints
+
+| Service | URL | Status |
+| --- | --- | --- |
+| API Gateway | <http://localhost:5000> | Phase 1 |
+| Identity Service (direct) | <http://localhost:5003> | Phase 1 |
+| RabbitMQ Management | <http://localhost:15672> | Phase 1 |
+| PostgreSQL | `localhost:5432` (see `POSTGRES_HOST_PORT`) | Phase 1 |
+| Frontend | <http://localhost:3000> | Phase 3 |
+
+--- | --- |
 | Frontend | <http://localhost:3000> |
 | API Gateway | <http://localhost:5000> |
 | RabbitMQ Management | <http://localhost:15672> |
@@ -297,7 +293,7 @@ npm run dev --prefix apps/frontend
 - [x] Microservices architecture and data model
 - [x] API contracts and event definitions
 - [x] AI context and contributor rules
-- [ ] Phase 1: Repository, Docker Compose, YARP gateway, Identity Service, CI/CD
+- [x] Phase 1: Repository, Docker Compose, YARP gateway, Identity Service, CI/CD
 - [ ] Phase 2: Catalog, Order, RabbitMQ events, SignalR, migrations
 - [ ] Phase 3: Public mobile menu with SSR and cart
 - [ ] Phase 4: Staff dashboard, KDS, menu and table management, receipt printing

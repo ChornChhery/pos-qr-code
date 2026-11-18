@@ -3,7 +3,10 @@
 Compact specification for the Restaurant POS & QR Ordering System.
 Full original specification: `docs/AI_CONTEXT_FULL.md` (read only when this file lacks detail).
 
-Current state: documentation only. No code, no `services/`, `apps/`, or `infra/` folders yet.
+Current state: Phase 1 (foundation) is built: `services/ApiGateway`, `services/IdentityService`,
+`tests/IdentityService.Tests`, `infra/` (Compose, Terraform), CI, and `scripts/`. Phases 2-6 are not
+built. There is no Catalog, Order, Payment, or Notification service and no `apps/frontend` yet.
+See `docs/PHASE_1_NOTES.md` for decisions and commands that exist.
 
 ---
 

@@ -93,6 +93,16 @@ Before merge:
 | Motion | `transitions-polish` when motion changed |
 | Security | server-side auth and role check |
 
+Commands that exist after Phase 1 (PowerShell, repo root):
+
+| Purpose | Command |
+| --- | --- |
+| First-time setup | `.\scripts\dev-setup.ps1` |
+| Build | `dotnet build POS.slnx` |
+| Unit tests | `dotnet test POS.slnx` |
+| Run gateway + identity | `.\scripts\run-all.ps1` |
+| End-to-end smoke test | `.\scripts\smoke-test.ps1` |
+
 If a command does not exist yet, say so. Do not invent one.
 
 ## Token discipline

@@ -12,8 +12,10 @@ Read in this order:
 Do not read every document or every skill. Open `docs/AI_CONTEXT_FULL.md` only when the
 compact spec lacks a detail, and load only the skills the current task needs.
 
-Current state: documentation only. There is no application code, and no `services/`,
-`apps/`, or `infra/` folders yet. Do not assume they exist.
+Current state: Phase 1 (foundation) is built: `services/ApiGateway`, `services/IdentityService`,
+`tests/IdentityService.Tests`, `infra/` (Compose, Terraform), CI, and `scripts/`. Phases 2-6 are not
+built. There is no Catalog, Order, Payment, or Notification service and no `apps/frontend` yet.
+See `docs/PHASE_1_NOTES.md` for decisions and commands that exist.
 
 Hard constraints, repeated because they are easy to break:
 

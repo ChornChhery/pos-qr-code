@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/services/">
+    <Project Path="services/ApiGateway/ApiGateway.csproj" />
+    <Project Path="services/IdentityService/IdentityService.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/IdentityService.Tests/IdentityService.Tests.csproj" />
+  </Folder>
+</Solution>
