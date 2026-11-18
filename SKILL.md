@@ -101,7 +101,8 @@ Commands that exist after Phase 1 (PowerShell, repo root):
 | Build | `dotnet build POS.slnx` |
 | Unit tests | `dotnet test POS.slnx` |
 | Run gateway + identity | `.\scripts\run-all.ps1` |
-| End-to-end smoke test | `.\scripts\smoke-test.ps1` |
+| Phase 1 smoke test | `.\scripts\smoke-test.ps1` |
+| Phase 2 smoke test | `.\scripts\smoke-test-phase2.ps1` |
 
 If a command does not exist yet, say so. Do not invent one.
 

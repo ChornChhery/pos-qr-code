@@ -56,6 +56,68 @@ services:
     ports:
       - "5003:5003"
 
+  catalog:
+    profiles: ["apps"]
+    build:
+      context: ..
+      dockerfile: services/CatalogService/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_URLS: http://+:5001
+      ConnectionStrings__CatalogDb: Host=postgres;Port=5432;Database=catalog_db;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?set JWT_SIGNING_KEY in .env}
+      Currency__UsdToKhrRate: ${USD_TO_KHR_RATE:-4000}
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: ${RABBITMQ_USER}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5001:5001"
+
+  order:
+    profiles: ["apps"]
+    build:
+      context: ..
+      dockerfile: services/OrderService/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_URLS: http://+:5002
+      ConnectionStrings__OrderDb: Host=postgres;Port=5432;Database=order_db;Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?set JWT_SIGNING_KEY in .env}
+      Currency__UsdToKhrRate: ${USD_TO_KHR_RATE:-4000}
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: ${RABBITMQ_USER}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5002:5002"
+
+  notification:
+    profiles: ["apps"]
+    build:
+      context: ..
+      dockerfile: services/NotificationService/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_URLS: http://+:5005
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?set JWT_SIGNING_KEY in .env}
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: ${RABBITMQ_USER}
+      RabbitMq__Password: ${RABBITMQ_PASSWORD}
+    ports:
+      - "5005:5005"
+
   gateway:
     profiles: ["apps"]
     build:
@@ -63,6 +125,9 @@ services:
     restart: unless-stopped
     depends_on:
       - identity
+      - catalog
+      - order
+      - notification
     environment:
       ASPNETCORE_ENVIRONMENT: Docker
       ASPNETCORE_URLS: http://+:5000

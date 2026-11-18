@@ -1,9 +1,17 @@
 <Solution>
+  <Folder Name="/shared/">
+    <Project Path="shared/Pos.Shared/Pos.Shared.csproj" />
+  </Folder>
   <Folder Name="/services/">
     <Project Path="services/ApiGateway/ApiGateway.csproj" />
+    <Project Path="services/CatalogService/CatalogService.csproj" />
     <Project Path="services/IdentityService/IdentityService.csproj" />
+    <Project Path="services/NotificationService/NotificationService.csproj" />
+    <Project Path="services/OrderService/OrderService.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/CatalogService.Tests/CatalogService.Tests.csproj" />
     <Project Path="tests/IdentityService.Tests/IdentityService.Tests.csproj" />
+    <Project Path="tests/OrderService.Tests/OrderService.Tests.csproj" />
   </Folder>
 </Solution>

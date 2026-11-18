@@ -6,7 +6,7 @@
   1. Checks .NET 10 SDK and Docker Desktop.
   2. Creates .env with random secrets if it does not exist.
   3. Restores tools and builds the solution.
-  4. Creates the Identity database migration if it does not exist yet.
+  4. Creates the Identity, Catalog, and Order database migrations if they do not exist yet.
   5. Starts PostgreSQL and RabbitMQ in Docker and waits until they are healthy.
 
 .PARAMETER RunTests
@@ -92,16 +92,18 @@ Write-Host '== 3/5 Restore and build ==' -ForegroundColor Cyan
 Invoke-Native { dotnet tool restore } 'dotnet tool restore failed.'
 Invoke-Native { dotnet build POS.slnx -c Debug } 'Build failed. Copy the first error message and send it to the AI.'
 
-Write-Host '== 4/5 Identity database migration ==' -ForegroundColor Cyan
-$migrations = Join-Path $root 'services\IdentityService\Migrations'
-if (Test-Path $migrations) {
-    Write-Host '   Migrations folder exists, keeping it'
-}
-else {
-    Invoke-Native {
-        dotnet ef migrations add InitialCreate --project services/IdentityService --output-dir Migrations
-    } 'Creating the migration failed.'
-    Write-Host '   Created InitialCreate migration (commit this folder to git)'
+Write-Host '== 4/5 Database migrations ==' -ForegroundColor Cyan
+foreach ($service in @('IdentityService', 'CatalogService', 'OrderService')) {
+    $migrations = Join-Path $root "services\$service\Migrations"
+    if (Test-Path $migrations) {
+        Write-Host "   ${service}: migrations folder exists, keeping it"
+    }
+    else {
+        Invoke-Native {
+            dotnet ef migrations add InitialCreate --project "services/$service" --output-dir Migrations
+        } "Creating the $service migration failed."
+        Write-Host "   ${service}: created InitialCreate migration (commit this folder to git)"
+    }
 }
 
 if ($RunTests) {

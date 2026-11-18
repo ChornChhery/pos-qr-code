@@ -113,7 +113,7 @@ $r = Invoke-Api POST '/api/auth/refresh'
 Check 'refresh without a cookie returns 401' ($r.Status -eq 401)
 
 $r = Invoke-Api GET '/api/catalog/products'
-Check 'catalog route reaches the gateway (502/503 until Phase 2 is built)' (@(502, 503, 404) -contains $r.Status)
+Check 'catalog route reaches the gateway (200 once Catalog runs, 502 if it is not running)' (@(200, 502, 503) -contains $r.Status)
 
 Write-Host ''
 if ($script:failures -eq 0) { Write-Host 'All checks passed.' -ForegroundColor Green; exit 0 }

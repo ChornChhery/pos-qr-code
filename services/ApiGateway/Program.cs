@@ -59,7 +59,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("frontend", policy => policy
         .WithOrigins(allowedOrigins)
         .AllowCredentials()
-        .WithHeaders("Authorization", "Content-Type")
+        .WithHeaders("Authorization", "Content-Type", "X-Requested-With", "X-SignalR-User-Agent")
         .WithMethods("GET", "POST", "PUT", "PATCH", "DELETE")));
 
 // ---- Rate limiting (per client IP) ----

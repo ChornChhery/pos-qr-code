@@ -3,7 +3,7 @@
 Paste one prompt into your AI tool (Claude Code, Codex, opencode) opened in `D:\pos-qr-code`.
 Do the phases in order. After each phase the AI must hand you a zip, a PowerShell extract script, and run steps.
 
-Phase status: **1 built** (this repo). 2 to 6 not started.
+Phase status: **1 and 2 built** (this repo). 3 to 6 not started.
 
 ---
 
@@ -45,6 +45,8 @@ Expand-Archive -Force C:\Users\Dell\Downloads\pos-phase1.zip D:\pos-qr-code
 ---
 
 ## Phase 2: Core business services
+
+> DONE. Use only to redo or extend Phase 2.
 
 ````text
 Start Phase 2 (Core business services) of the Restaurant POS project in this repository.
@@ -99,12 +101,13 @@ Never commit unless I say so. Never invent endpoints, tables, ports, or environm
 
 ## Scope
 `apps/frontend` with Next.js App Router, TypeScript strict, Tailwind, shadcn/ui, Zustand, React Query.
+Show every price in both USD and riel using the `price` and `priceKhr` fields from the API (never convert in the browser).
 Customer flow: scan `/?table=12`, menu with skeleton loaders (SSR/ISR), category, product modal, modifiers, cart, checkout, order tracking.
 Server totals are authoritative; the client total is display only. Mobile-first, touch targets at least 44x44 px, checked at 360, 390, 768 px.
 Every action has loading, empty, success, and error states. Add Vitest unit tests and the first Playwright journey.
 
 ## Before you write code
-Ask me before coding: restaurant name and logo, brand colors (default is warm deep orange or red), languages to support,
+Ask me before coding: restaurant name and logo, brand colors (default is warm deep orange or red), languages to support (for example Khmer and English),
 and any reference apps I like. Use `spec-driven-development`, then the new-page sequence in `SKILL.md`.
 
 ## Done when

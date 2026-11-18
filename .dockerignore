@@ -1,0 +1,14 @@
+# Used when the build context is the repository root (Catalog, Order, Notification images).
+**/bin/
+**/obj/
+.git
+.agents
+.codex
+.github
+.env
+node_modules
+tests
+docs
+infra
+scripts
+**/*.user

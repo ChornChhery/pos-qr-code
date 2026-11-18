@@ -32,7 +32,13 @@ jobs:
         run: |
           dotnet format services/ApiGateway/ApiGateway.csproj --verify-no-changes --severity error --no-restore
           dotnet format services/IdentityService/IdentityService.csproj --verify-no-changes --severity error --no-restore
+          dotnet format services/CatalogService/CatalogService.csproj --verify-no-changes --severity error --no-restore
+          dotnet format services/OrderService/OrderService.csproj --verify-no-changes --severity error --no-restore
+          dotnet format services/NotificationService/NotificationService.csproj --verify-no-changes --severity error --no-restore
+          dotnet format shared/Pos.Shared/Pos.Shared.csproj --verify-no-changes --severity error --no-restore
           dotnet format tests/IdentityService.Tests/IdentityService.Tests.csproj --verify-no-changes --severity error --no-restore
+          dotnet format tests/CatalogService.Tests/CatalogService.Tests.csproj --verify-no-changes --severity error --no-restore
+          dotnet format tests/OrderService.Tests/OrderService.Tests.csproj --verify-no-changes --severity error --no-restore
 
       - name: Build
         run: dotnet build POS.slnx -c Release --no-restore
@@ -57,7 +63,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        service: [ApiGateway, IdentityService]
+        include:
+          - service: ApiGateway
+            context: services/ApiGateway
+          - service: IdentityService
+            context: services/IdentityService
+          # These reference shared/Pos.Shared, so their build context is the repository root.
+          - service: CatalogService
+            context: .
+          - service: OrderService
+            context: .
+          - service: NotificationService
+            context: .
     steps:
       - uses: actions/checkout@v4
 
@@ -78,7 +95,8 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: services/${{ matrix.service }}
+          context: ${{ matrix.context }}
+          file: services/${{ matrix.service }}/Dockerfile
           push: ${{ github.event_name == 'push' }}
           tags: |
             ${{ steps.name.outputs.image }}:${{ github.sha }}

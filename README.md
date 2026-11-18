@@ -178,7 +178,8 @@ restaurant-pos/
 |   |-- postgres/init/        # creates the four service databases
 |   `-- terraform/
 |-- .github/workflows/        # CI (GitHub only reads workflows from the repo root)
-|-- scripts/                  # dev-setup, run-all, smoke-test, make-phase-zip
+|-- shared/Pos.Shared/        # event contracts, auth setup, envelope, money helpers
+|-- scripts/                  # dev-setup, run-all, smoke tests, make-phase-zip
 |-- tests/
 |   `-- IdentityService.Tests/
 |-- docs/
@@ -194,16 +195,16 @@ restaurant-pos/
 
 ## Project Status
 
-> **Phase 1 is built.** The API Gateway, Identity Service, Docker Compose, CI, and Terraform
-> foundation exist. Phases 2-6 (Catalog, Order, frontend, payments, hardening) are not built yet.
-> See [docs/PHASE_1_NOTES.md](./docs/PHASE_1_NOTES.md) and [docs/PHASE_1_RUNBOOK.md](./docs/PHASE_1_RUNBOOK.md).
+> **Phases 1 and 2 are built.** Gateway, Identity, Catalog, Order, and Notification services, Docker Compose,
+> CI, and Terraform foundation exist. Phases 3-6 (frontend, staff dashboard, payments, hardening) are not built yet.
+> See [docs/PHASE_2_NOTES.md](./docs/PHASE_2_NOTES.md) and [docs/PHASE_2_RUNBOOK.md](./docs/PHASE_2_RUNBOOK.md).
 
 | Milestone | Status |
 | --- | --- |
 | Product specification and AI context | Complete |
 | Architecture, API, and schema design | Complete |
 | Phase 1: Foundation and infrastructure | Built (verify with the runbook) |
-| Phase 2: Core business services | Not started |
+| Phase 2: Core business services | Built (verify with the runbook) |
 | Phase 3: Public customer menu | Not started |
 | Phase 4: Staff dashboard | Not started |
 | Phase 5: Payments and admin | Not started |
@@ -228,7 +229,8 @@ restaurant-pos/
 # from the repository root
 .\scripts\dev-setup.ps1      # creates .env, builds, creates the DB migration, starts PostgreSQL + RabbitMQ
 .\scripts\run-all.ps1        # starts the Gateway (5000) and Identity Service (5003)
-.\scripts\smoke-test.ps1     # checks login, refresh, RBAC, and user management through the gateway
+.\scripts\smoke-test.ps1     # Phase 1: login, refresh, RBAC, and user management through the gateway
+.\scripts\smoke-test-phase2.ps1  # Phase 2: menu, riel prices, cart, checkout, order status, stock, SignalR
 ```
 
 Full steps and troubleshooting: [docs/PHASE_1_RUNBOOK.md](./docs/PHASE_1_RUNBOOK.md).
@@ -239,6 +241,9 @@ Full steps and troubleshooting: [docs/PHASE_1_RUNBOOK.md](./docs/PHASE_1_RUNBOOK
 | --- | --- | --- |
 | API Gateway | <http://localhost:5000> | Phase 1 |
 | Identity Service (direct) | <http://localhost:5003> | Phase 1 |
+| Catalog Service (direct) | <http://localhost:5001> | Phase 2 |
+| Order Service (direct) | <http://localhost:5002> | Phase 2 |
+| Notification Service (direct) | <http://localhost:5005> | Phase 2 |
 | RabbitMQ Management | <http://localhost:15672> | Phase 1 |
 | PostgreSQL | `localhost:5432` (see `POSTGRES_HOST_PORT`) | Phase 1 |
 | Frontend | <http://localhost:3000> | Phase 3 |
@@ -294,7 +299,7 @@ Full steps and troubleshooting: [docs/PHASE_1_RUNBOOK.md](./docs/PHASE_1_RUNBOOK
 - [x] API contracts and event definitions
 - [x] AI context and contributor rules
 - [x] Phase 1: Repository, Docker Compose, YARP gateway, Identity Service, CI/CD
-- [ ] Phase 2: Catalog, Order, RabbitMQ events, SignalR, migrations
+- [x] Phase 2: Catalog, Order, RabbitMQ events, SignalR, migrations
 - [ ] Phase 3: Public mobile menu with SSR and cart
 - [ ] Phase 4: Staff dashboard, KDS, menu and table management, receipt printing
 - [ ] Phase 5: Payment Service, admin reports, audit logs, QR generation
@@ -335,4 +340,4 @@ Checklist:
 
 ## License
 
-By Mr.Chorn Chhery
+Proprietary software. All rights reserved.
