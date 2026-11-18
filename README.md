@@ -335,4 +335,4 @@ Checklist:
 
 ## License
 
-Proprietary software. All rights reserved.
+By Mr.Chorn Chhery
