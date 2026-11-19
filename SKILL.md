@@ -103,6 +103,9 @@ Commands that exist after Phase 1 (PowerShell, repo root):
 | Run gateway + identity | `.\scripts\run-all.ps1` |
 | Phase 1 smoke test | `.\scripts\smoke-test.ps1` |
 | Phase 2 smoke test | `.\scripts\smoke-test-phase2.ps1` |
+| Phase 3 smoke test | `.\scripts\smoke-test-phase3.ps1` |
+| Web menu: tests / lint / types | `cd apps\frontend; npm test; npm run lint; npm run typecheck` |
+| Web menu without the backend | `cd apps\frontend; npm run dev:mock` (then `npm run dev`) |
 
 If a command does not exist yet, say so. Do not invent one.
 

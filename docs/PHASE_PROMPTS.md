@@ -3,7 +3,7 @@
 Paste one prompt into your AI tool (Claude Code, Codex, opencode) opened in `D:\pos-qr-code`.
 Do the phases in order. After each phase the AI must hand you a zip, a PowerShell extract script, and run steps.
 
-Phase status: **1 and 2 built** (this repo). 3 to 6 not started.
+Phase status: **1, 2, and 3 built** (this repo). 4 to 6 not started.
 
 ---
 
@@ -90,6 +90,8 @@ Expand-Archive -Force C:\Users\Dell\Downloads\pos-phase2.zip D:\pos-qr-code
 ---
 
 ## Phase 3: Public customer menu (Next.js)
+
+> DONE. Use only to redo or extend Phase 3.
 
 ````text
 Start Phase 3 (Public customer menu (Next.js)) of the Restaurant POS project in this repository.

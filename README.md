@@ -195,9 +195,9 @@ restaurant-pos/
 
 ## Project Status
 
-> **Phases 1 and 2 are built.** Gateway, Identity, Catalog, Order, and Notification services, Docker Compose,
-> CI, and Terraform foundation exist. Phases 3-6 (frontend, staff dashboard, payments, hardening) are not built yet.
-> See [docs/PHASE_2_NOTES.md](./docs/PHASE_2_NOTES.md) and [docs/PHASE_2_RUNBOOK.md](./docs/PHASE_2_RUNBOOK.md).
+> **Phases 1, 2, and 3 are built.** Gateway, Identity, Catalog, Order, and Notification services, the customer web menu,
+> Docker Compose, CI, and Terraform foundation exist. Phases 4-6 (staff dashboard, payments, hardening) are not built yet.
+> See [docs/PHASE_3_NOTES.md](./docs/PHASE_3_NOTES.md) and [docs/PHASE_3_RUNBOOK.md](./docs/PHASE_3_RUNBOOK.md).
 
 | Milestone | Status |
 | --- | --- |
@@ -205,7 +205,7 @@ restaurant-pos/
 | Architecture, API, and schema design | Complete |
 | Phase 1: Foundation and infrastructure | Built (verify with the runbook) |
 | Phase 2: Core business services | Built (verify with the runbook) |
-| Phase 3: Public customer menu | Not started |
+| Phase 3: Public customer menu | Built (verify with the runbook) |
 | Phase 4: Staff dashboard | Not started |
 | Phase 5: Payments and admin | Not started |
 | Phase 6: Testing and production | Not started |
@@ -231,6 +231,8 @@ restaurant-pos/
 .\scripts\run-all.ps1        # starts the Gateway (5000) and Identity Service (5003)
 .\scripts\smoke-test.ps1     # Phase 1: login, refresh, RBAC, and user management through the gateway
 .\scripts\smoke-test-phase2.ps1  # Phase 2: menu, riel prices, cart, checkout, order status, stock, SignalR
+.\scripts\smoke-test-phase3.ps1  # Phase 3: web menu on port 3000, Khmer, riel, browser access to the API
+# then open http://localhost:3000/?table=1
 ```
 
 Full steps and troubleshooting: [docs/PHASE_1_RUNBOOK.md](./docs/PHASE_1_RUNBOOK.md).
@@ -246,7 +248,7 @@ Full steps and troubleshooting: [docs/PHASE_1_RUNBOOK.md](./docs/PHASE_1_RUNBOOK
 | Notification Service (direct) | <http://localhost:5005> | Phase 2 |
 | RabbitMQ Management | <http://localhost:15672> | Phase 1 |
 | PostgreSQL | `localhost:5432` (see `POSTGRES_HOST_PORT`) | Phase 1 |
-| Frontend | <http://localhost:3000> | Phase 3 |
+| Web menu (customer) | <http://localhost:3000/?table=1> | Phase 3 |
 
 --- | --- |
 | Frontend | <http://localhost:3000> |
@@ -300,7 +302,7 @@ Full steps and troubleshooting: [docs/PHASE_1_RUNBOOK.md](./docs/PHASE_1_RUNBOOK
 - [x] AI context and contributor rules
 - [x] Phase 1: Repository, Docker Compose, YARP gateway, Identity Service, CI/CD
 - [x] Phase 2: Catalog, Order, RabbitMQ events, SignalR, migrations
-- [ ] Phase 3: Public mobile menu with SSR and cart
+- [x] Phase 3: Public mobile menu with SSR and cart
 - [ ] Phase 4: Staff dashboard, KDS, menu and table management, receipt printing
 - [ ] Phase 5: Payment Service, admin reports, audit logs, QR generation
 - [ ] Phase 6: Tests, load testing, monitoring, security audit, production deploy

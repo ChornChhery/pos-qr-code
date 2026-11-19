@@ -23,10 +23,15 @@ function Invoke-Api {
     param([string]$Method, [string]$Path, $Body = $null, [string]$Token = $null, [string]$Cookie = $null)
     $headers = @{}
     if ($Token) { $headers['Authorization'] = "Bearer $Token" }
-    if ($Cookie) { $headers['Cookie'] = $Cookie }
     $request = @{
         Uri = "$BaseUrl$Path"; Method = $Method; Headers = $headers
         UseBasicParsing = $true; ContentType = 'application/json'
+    }
+    if ($Cookie -match '^([^=]+)=(.*)$') {
+        # A cookie sent through a web session works in Windows PowerShell and PowerShell 7 alike.
+        $session = New-Object Microsoft.PowerShell.Commands.WebRequestSession
+        $session.Cookies.Add((New-Object System.Net.Cookie($Matches[1], $Matches[2], '/', ([uri]$BaseUrl).Host)))
+        $request['WebSession'] = $session
     }
     if ($null -ne $Body) { $request['Body'] = ($Body | ConvertTo-Json -Compress) }
     try {

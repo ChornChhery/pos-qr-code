@@ -53,9 +53,48 @@ jobs:
           path: coverage
           if-no-files-found: ignore
 
+  frontend:
+    name: Web menu (lint, types, tests, build, E2E)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/frontend/package-lock.json
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+
+      - name: Build
+        run: npm run build
+        env:
+          API_URL: http://localhost:5000
+          NEXT_PUBLIC_API_URL: http://localhost:5000
+
+      - run: npx playwright install --with-deps chromium
+
+      # The journey runs against mock-api/server.mjs, so no backend is needed.
+      - name: End-to-end journey
+        run: npm run test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: apps/frontend/playwright-report
+          if-no-files-found: ignore
+
   images:
     name: Build container images
-    needs: backend
+    needs: [backend, frontend]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -66,15 +105,23 @@ jobs:
         include:
           - service: ApiGateway
             context: services/ApiGateway
+            dockerfile: services/ApiGateway/Dockerfile
           - service: IdentityService
             context: services/IdentityService
+            dockerfile: services/IdentityService/Dockerfile
           # These reference shared/Pos.Shared, so their build context is the repository root.
           - service: CatalogService
             context: .
+            dockerfile: services/CatalogService/Dockerfile
           - service: OrderService
             context: .
+            dockerfile: services/OrderService/Dockerfile
           - service: NotificationService
             context: .
+            dockerfile: services/NotificationService/Dockerfile
+          - service: Frontend
+            context: apps/frontend
+            dockerfile: apps/frontend/Dockerfile
     steps:
       - uses: actions/checkout@v4
 
@@ -96,7 +143,7 @@ jobs:
       - uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.context }}
-          file: services/${{ matrix.service }}/Dockerfile
+          file: ${{ matrix.dockerfile }}
           push: ${{ github.event_name == 'push' }}
           tags: |
             ${{ steps.name.outputs.image }}:${{ github.sha }}

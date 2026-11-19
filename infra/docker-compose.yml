@@ -135,6 +135,22 @@ services:
     ports:
       - "5000:5000"
 
+  frontend:
+    profiles: ["apps"]
+    build:
+      context: ../apps/frontend
+      args:
+        # Compiled into the browser bundle: the address a guest's phone uses to reach the gateway.
+        NEXT_PUBLIC_API_URL: ${PUBLIC_API_URL:-http://localhost:5000}
+        NEXT_PUBLIC_RESTAURANT_NAME: ${RESTAURANT_NAME:-My Restaurant}
+    restart: unless-stopped
+    depends_on:
+      - gateway
+    environment:
+      API_URL: http://gateway:5000
+    ports:
+      - "3000:3000"
+
 volumes:
   pg_data:
   rabbit_data:

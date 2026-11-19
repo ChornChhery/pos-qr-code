@@ -13,6 +13,10 @@ coverage/
 # Node
 node_modules/
 .next/
+playwright-report/
+test-results/
+*.tsbuildinfo
+next-env.d.ts
 
 # Terraform
 .terraform/
